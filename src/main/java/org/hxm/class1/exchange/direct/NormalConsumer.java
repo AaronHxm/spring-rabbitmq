@@ -72,7 +72,6 @@ public class NormalConsumer {
       }
     };
     channel.basicConsume(queueName,true,consumer);
-    https://github.com/CrazyAaronM/spring-rabbitmq.git
   }
 }
 
