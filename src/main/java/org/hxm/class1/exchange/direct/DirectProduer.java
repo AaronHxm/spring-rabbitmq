@@ -36,6 +36,7 @@ public class DirectProduer {
     for (int i = 0; i < 3; i++) {
       String routerKey = routerKeys[i];
       String msg = "hello,rabbit mq ,my log level is " + routerKey;
+      System.out.println(msg);
       //发送消息
       channel.basicPublish(EXCHANGE_NAME, routerKey, null, msg.getBytes());
     }
