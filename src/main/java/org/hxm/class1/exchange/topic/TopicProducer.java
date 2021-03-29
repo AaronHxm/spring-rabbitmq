@@ -19,7 +19,7 @@ public class TopicProducer {
   public static void main(String[] args) throws IOException, TimeoutException {
 
     //交换机名称
-    final String EXCHANGE_NAME = "first-fanout";
+    final String EXCHANGE_NAME = "first-topic";
 
     ConnectionFactory factory = new ConnectionFactory();
     factory.setUsername("guest");
@@ -29,21 +29,26 @@ public class TopicProducer {
     Connection connection = factory.newConnection();
     // 创建信道
     Channel channel = connection.createChannel();
-    channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT, true);
+    channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.TOPIC, true);
     //定义消息的路由健
     String[] routerKeys = {"warning", "info", "debug"};
 
-    String[] model= {"user", "email", "model"};
+    String[] models= {"user", "email", "model"};
 
-    String[] service = {"A", "B", "C"};
+    String[] services = {"A", "B", "C"};
 
 
     for (int i = 0; i < 3; i++) {
-      String routerKey = routerKeys[i];
-      String msg = "hello,rabbit mq ,my log level is " + routerKey;
-      System.out.println(msg);
-      //发送消息
-      channel.basicPublish(EXCHANGE_NAME, routerKey, null, msg.getBytes());
+      for(String model : models){
+        for(String server : services){
+          //roterKey 类似于 warning.user.A
+          String routerKey = routerKeys[i]+"."+model+"."+server;
+          String msg = "hello,rabbit mq ,my log level is " + routerKey;
+          System.out.println(msg);
+          //发送消息
+          channel.basicPublish(EXCHANGE_NAME, routerKey, null, msg.getBytes());
+        }
+      }
     }
     channel.close();
     connection.close();
