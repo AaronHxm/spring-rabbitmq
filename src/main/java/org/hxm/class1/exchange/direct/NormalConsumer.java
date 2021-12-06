@@ -37,7 +37,7 @@ public class NormalConsumer {
     //声明队列
     String queueName =  "consumerInfo";  //  channel.queueDeclare().getQueue();//随即名称
     //声明消费的key info
-    String routingKey = "info";
+    String routingKey = "debug";
 //
     channel.queueDeclare(queueName,
         false,//是否持久化
@@ -47,6 +47,7 @@ public class NormalConsumer {
     );
     //绑定队列，通过键 info 将队列和交换器绑定起来
     channel.queueBind(queueName, EXCHANGE_NAME, routingKey);
+    System.out.println("消费者已运行，正在等待消息");
     //定义一个消费者
     final Consumer consumer = new DefaultConsumer(channel) {
       /**

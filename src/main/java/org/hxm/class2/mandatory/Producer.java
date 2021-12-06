@@ -7,7 +7,7 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * @author aaron.hu
- * @Description:
+ * @Description: 失败通知
  * @date 2021/4/7 9:29
  */
 public class Producer {
