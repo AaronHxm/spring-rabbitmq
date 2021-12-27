@@ -28,6 +28,7 @@ public class Producer {
         channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT, true);
 
         channel.addReturnListener(new ReturnListener() {
+            @Override
             public void handleReturn(int replyCode, String replyText, String exchange, String routingKey, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 System.out.println("replyText: " + replyText);
                 System.out.println("exchange: " + exchange);
@@ -39,6 +40,7 @@ public class Producer {
          * 通道关闭时通知
          */
         channel.addShutdownListener(new ShutdownListener() {
+            @Override
             public void shutdownCompleted(ShutdownSignalException cause) {
                 System.out.println(cause.getMessage());
 
