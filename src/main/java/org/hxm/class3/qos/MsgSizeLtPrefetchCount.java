@@ -1,6 +1,5 @@
 package org.hxm.class3.qos;
 
-import com.rabbitmq.client.AMQP.Basic.Qos;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
@@ -14,17 +13,22 @@ import java.util.concurrent.TimeoutException;
 /**
  * @author : Aaron
  *
- * create at:  2021/3/22  13:18
+ * create at:  2022/2/10  16:32
  *
- * description: qos
- *使用qos的步骤
- *  * 1. autoAck设置为false
- *  * 2. 调用basicConsume方法前先调用basicQos方法
+ * description: 发送消息数量小于 预抓取数量
+ *
+ *
+ *
+ * 当发送数量(400) > prefetchCount(220) 消费者 只能接收到220条消息，消费者挂掉后，消息回到队列中
+ *测试方法
+ * 1、QosBatchConsumer 确认消息的代码注释点
+ * 2、QosProducer 中发送数量改成400
+ * 3、QosOneConsumer 中注释掉    channel.basicConsume(queueName,false,consumer); 另外一个消费者
+ *
  *
  *
  */
-public class QosOneConsumer {
-
+public class MsgSizeLtPrefetchCount {
   public static void main(String[] args) throws IOException, TimeoutException {
     final String EXCHANGE_NAME = "first-qos";
 
@@ -37,7 +41,7 @@ public class QosOneConsumer {
     // 创建信道
     final Channel channel = connection.createChannel();
 
-     channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT, false);
+    channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT, false);
     //声明队列
     String queueName =  "consumerInfo";  //  channel.queueDeclare().getQueue();//随即名称
     //声明消费的key info
@@ -77,7 +81,7 @@ public class QosOneConsumer {
           System.out.println(bodyStr);
           channel.basicAck(deliveryTag, false);
         }catch (Exception e){
-      //出现异常  不确认
+          //出现异常  不确认
 
 
         }
@@ -87,7 +91,6 @@ public class QosOneConsumer {
         //
       }
     };
-    channel.basicConsume(queueName,false,consumer);
     /**
      *
      * prefetchSize：最多传输的内容的大小的限制，0为不限制，但据说prefetchSize参数，rabbitmq没有实现。
@@ -96,15 +99,15 @@ public class QosOneConsumer {
      *
      * global：true\false 是否将上面设置应用于channel，简单点说，就是上面限制是channel级别的还是consumer级别。
      */
-    channel.basicQos(100, false); // Per consumer limit
+   // channel.basicQos(100, false); // Per consumer limit
 
-    channel.basicQos(150, true);  // Per channel limit
+    channel.basicQos(220, true);  // Per channel limit
 
     /**
      * 以上表示  整个通道加起来最多允许150条未确认的消息，每个消费者则最多有100条消息。
      */
     QosBatchConsumer batchAckConsumer = new QosBatchConsumer(channel);
-    channel.basicConsume(queueName,false,consumer);
+ //   channel.basicConsume(queueName,false,consumer);
     channel.basicConsume(queueName,false,batchAckConsumer);
   }
 

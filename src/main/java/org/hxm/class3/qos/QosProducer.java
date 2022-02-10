@@ -38,7 +38,7 @@ public class QosProducer {
     //发送消息
     for (int i =0;i<210;i++){
       String msg = "hello,rabbit mq ,my log level is " + routerKey+i;
-      if(i==209){
+      if(i== 209){
         msg = "stop";
       }
 
